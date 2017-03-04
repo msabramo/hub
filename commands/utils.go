@@ -73,9 +73,11 @@ func isCloneable(file string) bool {
 func gitRemoteForProject(project *github.Project) (foundRemote *github.Remote) {
 	remotes, err := github.Remotes()
 	utils.Check(err)
+	fmt.Printf("gitRemoteForProject: remotes = %+v\n", remotes)
 	for _, remote := range remotes {
 		remoteProject, pErr := remote.Project()
 		if pErr == nil && remoteProject.SameAs(project) {
+			fmt.Printf("gitRemoteForProject: remoteProject = %+v; project = %+v; using remote = %+v\n", remoteProject, project, remote)
 			foundRemote = &remote
 			return
 		}

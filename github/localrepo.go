@@ -122,21 +122,29 @@ func (r *GitHubRepo) RemoteBranchAndProject(owner string, preferUpstream bool) (
 	r.loadRemotes()
 
 	for _, remote := range r.remotes {
+		// fmt.Printf("RemoteBranchAndProject: remote.Project() = %+v\n", remote.Project())
 		if p, err := remote.Project(); err == nil {
 			project = p
+			fmt.Printf("RemoteBranchAndProject: Found something! project = %+v\n", project)
 			break
 		}
 	}
 
 	branch, err = r.CurrentBranch()
+	fmt.Printf("RemoteBranchAndProject: [1] branch = %+v\n", branch)
 	if err != nil {
 		return
 	}
 
 	if project != nil {
-		branch = branch.PushTarget(owner, preferUpstream)
-		if branch != nil && branch.IsRemote() {
-			remote, e := r.RemoteByName(branch.RemoteName())
+		branch2 := branch.PushTarget(owner, preferUpstream)
+		fmt.Printf("RemoteBranchAndProject: [2] branch2 = %+v\n", branch2)
+		if branch2 == nil {
+			branch2 = branch.PushTarget("origin", preferUpstream)
+			fmt.Printf("RemoteBranchAndProject: [3] branch2 = %+v\n", branch2)
+		}
+		if branch2 != nil && branch2.IsRemote() {
+			remote, e := r.RemoteByName(branch2.RemoteName())
 			if e == nil {
 				project, err = remote.Project()
 				if err != nil {

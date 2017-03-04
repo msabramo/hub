@@ -130,7 +130,9 @@ func pullRequest(cmd *Command, args *Args) {
 	}
 	client := github.NewClientWithHost(host)
 
+	fmt.Printf("[1] host.User = %+v\n", host.User)
 	trackedBranch, headProject, err := localRepo.RemoteBranchAndProject(host.User, false)
+	fmt.Printf("[1] headProject = %+v\n", headProject)
 	utils.Check(err)
 
 	var (
@@ -202,8 +204,11 @@ func pullRequest(cmd *Command, args *Args) {
 
 	baseTracking := base
 	headTracking := head
+	fmt.Printf("baseTracking = %+v\n", baseTracking)
+	fmt.Printf("headTracking = %+v\n", headTracking)
 
 	remote := gitRemoteForProject(baseProject)
+	fmt.Printf("remote = %+v; baseProject = %+v; headProject = %+v\n", remote, baseProject, headProject)
 	if remote != nil {
 		baseTracking = fmt.Sprintf("%s/%s", remote.Name, base)
 	}
@@ -212,6 +217,7 @@ func pullRequest(cmd *Command, args *Args) {
 	}
 	if remote != nil {
 		headTracking = fmt.Sprintf("%s/%s", remote.Name, head)
+		fmt.Printf("[2] headTracking = %+v\n", headTracking)
 	}
 
 	if flagPullRequestPush && remote == nil {
@@ -225,6 +231,7 @@ func pullRequest(cmd *Command, args *Args) {
 		utils.Check(err)
 	} else if flagPullRequestIssue == "" {
 		headForMessage := headTracking
+		fmt.Printf("headForMessage = %+v\n", headForMessage)
 		if flagPullRequestPush {
 			headForMessage = head
 		}
@@ -346,7 +353,9 @@ func createPullRequestMessage(base, head, fullBase, fullHead string) (string, er
 		err        error
 	)
 
+	fmt.Printf("createPullRequestMessage: base = %+v; head = %+v; fullBase = %+v; fullHead = %+v\n", base, head, fullBase, fullHead)
 	commits, _ := git.RefList(base, head)
+	fmt.Printf("createPullRequestMessage: commits = %+v\n", commits)
 	if len(commits) == 1 {
 		defaultMsg, err = git.Show(commits[0])
 		if err != nil {
